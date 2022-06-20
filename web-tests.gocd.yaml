@@ -90,7 +90,7 @@ pipelines:
                   command: bash
                   arguments:
                     -  -c
-                    -  echo "Building..."
+                    -  docker build -t martinsgrinfelds/mvn_tests:latest .
       - deploy-stg:
           environment_variables:
             ENV_NAME: STG
