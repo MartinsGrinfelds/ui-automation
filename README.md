@@ -1,0 +1,1 @@
+Docker image - martinsgrinfelds/mvn_tests:latest
