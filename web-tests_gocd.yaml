@@ -1,0 +1,88 @@
+---
+format_version: 10
+common:
+  deploy-task: &deploy-tasks
+    - exec:
+        command: bash
+        arguments:
+          -  -c
+          -  echo "Deployment on ${ENV_NAME} environment triggered..."
+  test-task: &test-tasks
+    - exec:
+        command: bash
+        arguments:
+          -  -c
+          -  echo "Running tests on ${ENV_NAME} environment triggered..."
+    - exec:
+        command: bash
+        arguments:
+          -  -c
+          -  docker run --network=host -d -t --name api_test_executor_${ENV_NAME} api_test_executor
+    - exec:
+        command: bash
+        arguments:
+          -  -c
+          -  docker exec api_test_executor_${ENV_NAME} cucumber --tags=@${ENV_NAME} --format html --out test-output/report.html
+    - exec:
+        run_if: any
+        command: bash
+        arguments:
+          -  -c
+          -  docker rm -f api_test_executor_${ENV_NAME}
+    - exec:
+        run_if: failed
+        command: bash
+        arguments:
+          -  -c
+          -  send_notification.sh “dev deployment" 1
+    - exec:
+        run_if: passed
+        command: bash
+        arguments:
+          -  -c
+          -  send_notification.sh “dev deployment" 0
+pipelines:
+  web-tests:
+    group: web-tests
+    materials:
+      mainGit:
+        git: https://github.com/MartinsGrinfelds/ui-automation.git
+        branch: main
+    stages:
+      - build:
+          jobs:
+            build:
+              tasks:
+              - exec:
+                  command: bash
+                  arguments:
+                    -  -c
+                    -  echo "Building..."
+      - deploy-stg:
+          environment_variables:
+            ENV_NAME: STG
+          jobs:
+            deploy:
+              tasks:
+                *deploy-tasks
+      - test-stg:
+          environment_variables:
+            ENV_NAME: STG
+          jobs:
+            test:
+              tasks:
+                *test-tasks
+      - deploy-prd:
+          environment_variables:
+            ENV_NAME: PRD
+          jobs:
+            deploy:
+              tasks:
+                *deploy-tasks
+      - test-prd:
+          environment_variables:
+            ENV_NAME: PRD
+          jobs:
+            test:
+              tasks:
+                *test-tasks
