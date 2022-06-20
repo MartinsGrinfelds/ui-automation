@@ -32,7 +32,7 @@ services:
       - test-automation-setup
     shm_size: "2gb"
   mvn-tests:
-    image: martinsgrinfelds/mvn_tests:latest
+    image: martinsgrinfelds/mvn_test:latest
     build: 
       context: .
       dockerfile: Dockerfile  

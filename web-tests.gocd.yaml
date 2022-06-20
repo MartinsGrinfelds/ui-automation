@@ -37,7 +37,7 @@ common:
         command: bash
         arguments:
           -  -c
-          -  docker run --restart=on-failure:3 --network=test-automation-setup --name mvn_test_exec_${ENV_NAME} martinsgrinfelds/mvn_tests:latest mvn clean test -Dbrowser=chrome -DgridURL=selenium-hub:4444
+          -  docker run --restart=on-failure:3 --network=test-automation-setup --name mvn_test_exec_${ENV_NAME} martinsgrinfelds/mvn_test:latest mvn clean test -Dbrowser=chrome -DgridURL=selenium-hub:4444
     - exec:
         run_if: any
         command: bash
@@ -90,7 +90,7 @@ pipelines:
                   command: bash
                   arguments:
                     -  -c
-                    -  docker build -t martinsgrinfelds/mvn_tests:latest .
+                    -  docker build -t martinsgrinfelds/mvn_test:latest .
       - deploy-stg:
           environment_variables:
             ENV_NAME: STG

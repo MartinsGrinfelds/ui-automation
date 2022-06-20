@@ -1,1 +1,1 @@
-Docker image - martinsgrinfelds/mvn_tests:latest
+Docker image - martinsgrinfelds/mvn_test:latest
