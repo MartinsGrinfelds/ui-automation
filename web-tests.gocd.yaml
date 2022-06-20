@@ -17,11 +17,6 @@ common:
         command: bash
         arguments:
           -  -c
-          -  docker network create test-automation-setup
-    - exec:
-        command: bash
-        arguments:
-          -  -c
           -  docker run -d -p 4444:4444 --net test-automation-setup --name selenium-hub selenium/hub:latest
     - exec:
         command: bash
@@ -37,7 +32,7 @@ common:
         command: bash
         arguments:
           -  -c
-          -  docker run -it --restart=on-failure:3 --network=test-automation-setup --name mvn_test_exec_${ENV_NAME} mvn clean test -Dbrowser=chrome -DgridURL=selenium-hub:4444
+          -  docker run --restart=on-failure:3 --network=test-automation-setup --name mvn_test_exec_${ENV_NAME} mvn clean test -Dbrowser=chrome -DgridURL=selenium-hub:4444
     - exec:
         run_if: any
         command: bash
@@ -45,23 +40,17 @@ common:
           -  -c
           -  docker rm -f mvn_test_exec_${ENV_NAME}
     - exec:
-        run_if: any
-        command: bash
-        arguments:
-          -  -c
-          -  docker network rm test-automation-setup
-    - exec:
         run_if: failed
         command: bash
         arguments:
           -  -c
-          -  send_notification.sh "dev deployment" 1
+          -  send_notification.sh no 1
     - exec:
         run_if: passed
         command: bash
         arguments:
           -  -c
-          -  send_notification.sh "dev deployment" 0
+          -  send_notification.sh yes 0
 pipelines:
   web-tests:
     group: web-tests
