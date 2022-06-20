@@ -55,13 +55,13 @@ common:
         command: bash
         arguments:
           -  -c
-          -  send_notification.sh “dev deployment" 1
+          -  send_notification.sh "dev deployment" 1
     - exec:
         run_if: passed
         command: bash
         arguments:
           -  -c
-          -  send_notification.sh “dev deployment" 0
+          -  send_notification.sh "dev deployment" 0
 pipelines:
   web-tests:
     group: web-tests
