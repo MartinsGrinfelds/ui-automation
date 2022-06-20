@@ -17,38 +17,39 @@ common:
         command: bash
         arguments:
           -  -c
-          -  docker run --network=host -d -t --name api_test_executor_${ENV_NAME} api_test_executor
+          -  docker network create test-automation-setup
     - exec:
         command: bash
         arguments:
           -  -c
-          -  docker run --network=host -d -t --name api_test_executor_${ENV_NAME} api_test_executor
-docker run -d -p 4444:4444 --net test-automation-setup --name selenium-hub selenium/hub:latest
-docker run -d --net test-automation-setup -e HUB_HOST=selenium-hub -v /dev/shm:/dev/shm selenium/node-chrome:latest
-docker run -d --net test-automation-setup -e HUB_HOST=selenium-hub -v /dev/shm:/dev/shm selenium/node-firefox:latest
+          -  docker run -d -p 4444:4444 --net test-automation-setup --name selenium-hub selenium/hub:latest
     - exec:
         command: bash
         arguments:
           -  -c
-          -  docker run --network=host -d -t --name api_test_executor_${ENV_NAME} api_test_executor
+          -  docker run -d --net test-automation-setup -e HUB_HOST=selenium-hub -v /dev/shm:/dev/shm selenium/node-chrome:latest
     - exec:
-        run_if: any
         command: bash
         arguments:
           -  -c
-          -  docker rm -f api_test_executor_${ENV_NAME}
+          -  docker run -d --net test-automation-setup -e HUB_HOST=selenium-hub -v /dev/shm:/dev/shm selenium/node-firefox:latest
     - exec:
-        run_if: any
         command: bash
         arguments:
           -  -c
-          -  docker network rm
+          -  docker run -it --restart=on-failure:3 --network=test-automation-setup --name mvn_test_exec_${ENV_NAME} mvn clean test -Dbrowser=chrome -DgridURL=selenium-hub:4444
     - exec:
         run_if: any
         command: bash
         arguments:
           -  -c
-          -  docker network rm
+          -  docker rm -f mvn_test_exec_${ENV_NAME}
+    - exec:
+        run_if: any
+        command: bash
+        arguments:
+          -  -c
+          -  docker network rm test-automation-setup
     - exec:
         run_if: failed
         command: bash
