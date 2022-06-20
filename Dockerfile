@@ -7,5 +7,7 @@ WORKDIR /docker
 COPY src src
 COPY .gitignore pom.xml send_notification.sh testNG.xml ./
 
+RUN RUN ["chmod", "+x", "./send_notification.sh"]
+
 RUN mvn dependency:resolve
 RUN mvn clean install -DskipTests
