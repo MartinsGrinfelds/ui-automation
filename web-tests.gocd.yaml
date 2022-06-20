@@ -22,13 +22,33 @@ common:
         command: bash
         arguments:
           -  -c
-          -  docker exec api_test_executor_${ENV_NAME} cucumber --tags=@${ENV_NAME} --format html --out test-output/report.html
+          -  docker run --network=host -d -t --name api_test_executor_${ENV_NAME} api_test_executor
+docker run -d -p 4444:4444 --net test-automation-setup --name selenium-hub selenium/hub:latest
+docker run -d --net test-automation-setup -e HUB_HOST=selenium-hub -v /dev/shm:/dev/shm selenium/node-chrome:latest
+docker run -d --net test-automation-setup -e HUB_HOST=selenium-hub -v /dev/shm:/dev/shm selenium/node-firefox:latest
+    - exec:
+        command: bash
+        arguments:
+          -  -c
+          -  docker run --network=host -d -t --name api_test_executor_${ENV_NAME} api_test_executor
     - exec:
         run_if: any
         command: bash
         arguments:
           -  -c
           -  docker rm -f api_test_executor_${ENV_NAME}
+    - exec:
+        run_if: any
+        command: bash
+        arguments:
+          -  -c
+          -  docker network rm
+    - exec:
+        run_if: any
+        command: bash
+        arguments:
+          -  -c
+          -  docker network rm
     - exec:
         run_if: failed
         command: bash
