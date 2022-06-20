@@ -22,12 +22,12 @@ common:
         command: bash
         arguments:
           -  -c
-          -  docker run -d --net test-automation-setup -e HUB_HOST=selenium-hub -v /dev/shm:/dev/shm selenium/node-chrome:latest
+          -  docker run -d --net test-automation-setup --name chrome_${ENV_NAME} -e HUB_HOST=selenium-hub -v /dev/shm:/dev/shm selenium/node-chrome:latest
     - exec:
         command: bash
         arguments:
           -  -c
-          -  docker run -d --net test-automation-setup -e HUB_HOST=selenium-hub -v /dev/shm:/dev/shm selenium/node-firefox:latest
+          -  docker run -d --net test-automation-setup --name firefox_${ENV_NAME} -e HUB_HOST=selenium-hub -v /dev/shm:/dev/shm selenium/node-firefox:latest
     - exec:
         command: bash
         arguments:
@@ -39,6 +39,24 @@ common:
         arguments:
           -  -c
           -  docker rm -f mvn_test_exec_${ENV_NAME}
+    - exec:
+        run_if: any
+        command: bash
+        arguments:
+          -  -c
+          -  docker rm -f selenium-hub
+    - exec:
+        run_if: any
+        command: bash
+        arguments:
+          -  -c
+          -  docker rm -f chrome_${ENV_NAME}
+    - exec:
+        run_if: any
+        command: bash
+        arguments:
+          -  -c
+          -  docker rm -f firefox_${ENV_NAME}
     - exec:
         run_if: failed
         command: bash
